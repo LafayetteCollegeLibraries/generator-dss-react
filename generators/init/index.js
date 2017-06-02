@@ -1,35 +1,30 @@
 const Generator = require('yeoman-generator')
-
-const flagTest =  val => (
-  val && (val === 'false' || val === 'no' || val === '0')
-    ? false
-    : true
-)
+const utils = require('../utils')
 
 module.exports = class extends Generator {
   constructor (args, opts) {
     super(args, opts)
 
     this.option('coverage', {
-      type: flagTest,
+      type: utils.bool,
       desc: 'Adds coverage reporting via Istanbul / Coveralls',
       default: true,
     })
 
     this.option('editorconfig', {
-      type: flagTest,
+      type: utils.bool,
       desc: 'Adds .editorconfig file',
       default: true,
     })
 
     this.option('lint', {
-      type: flagTest,
+      type: utils.bool,
       desc: 'Adds linting via eslint',
       default: true,
     })
 
     this.option ('tests', {
-      type: flagTest,
+      type: utils.bool,
       desc: 'Installs testing architecture (Karma, Mocha, Chai)',
       default: true,
     })

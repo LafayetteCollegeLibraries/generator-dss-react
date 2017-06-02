@@ -1,4 +1,5 @@
 const Generator = require('yeoman-generator')
+const utils = require('../utils')
 
 module.exports = class extends Generator {
   constructor (args, opts) {
@@ -7,53 +8,56 @@ module.exports = class extends Generator {
     this.argument('name', {
       desc: 'Name of the component (use CamelCase per best-practices)',
       required: true,
-
+      type: String,
     })
 
     this.option('cjs', {
       desc: 'Use commonjs modules (ex. `module.exports` and `const module = require(\'module\')`',
       default: false,
+      type: utils.bool,
     })
 
     this.option('component', {
       desc: 'Shortcut for `--type=component`',
       default: false,
+      type: utils.bool,
     })
 
     this.option('container', {
       desc: 'Shortcut for `--type=container`',
       default: false,
+      type: utils.bool,
     })
 
     this.option('es6', {
       desc: 'Use es6 modules (ex. `export default` and `import module from \'module\')',
       default: true,
+      type: utils.bool,
     })
 
     this.option('screen', {
       desc: 'Shortcut for `--type=screen',
       default: false,
+      type: utils.bool,
     })
 
     this.option('shallow', {
       alias: 'S',
       desc: 'Use shallow file modules (creates files in `/src` directory)',
-      default: false
+      default: false,
+      type: utils.bool,
     })
 
     this.option('test', {
       alias: 't',
       desc: 'Adds empty `test.js` file to directory when in full mode',
       default: true,
-      type: val => (
-        val && (val === 'false' || val === 'no' || val === '0')
-          ? false
-          : true
-      ),
+      type: utils.bool,
     })
 
     this.option('type', {
       desc: 'Type of component (used to determine directory within `/src` to insert)',
+      type: String,
     })
   }
 
