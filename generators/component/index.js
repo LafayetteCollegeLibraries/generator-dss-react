@@ -13,63 +13,58 @@ module.exports = class extends Generator {
 
     this.option('cjs', {
       desc: 'Use commonjs modules (ex. `module.exports` and `const module = require(\'module\')`',
+      type: utils.bool.false,
       default: false,
-      type: utils.bool,
     })
 
     this.option('component', {
       desc: 'Shortcut for `--type=component`',
+      type: utils.bool.false,
       default: false,
-      type: utils.bool,
     })
 
     this.option('container', {
       desc: 'Shortcut for `--type=container`',
+      type: utils.bool.false,
       default: false,
-      type: utils.bool,
     })
 
     this.option('es6', {
       desc: 'Use es6 modules (ex. `export default` and `import module from \'module\')',
+      type: utils.bool.true,
       default: true,
-      type: utils.bool,
     })
 
     this.option('screen', {
       desc: 'Shortcut for `--type=screen',
+      type: utils.bool.false,
       default: false,
-      type: utils.bool,
     })
 
     this.option('shallow', {
       alias: 'S',
       desc: 'Use shallow file modules (creates files in `/src` directory)',
+      type: utils.bool.false,
       default: false,
-      type: utils.bool,
     })
 
     this.option('test', {
       alias: 't',
       desc: 'Adds empty `test.js` file to directory when in full mode',
+      type: utils.bool.true,
       default: true,
-      type: utils.bool,
     })
 
     this.option('type', {
       desc: 'Type of component (used to determine directory within `/src` to insert)',
       type: String,
     })
-  }
 
-  initializing () {
-    // either:
-    // `src/components/ComponentName`
-    // `components/ComponentName`
-    // `ComponentName`
     const split = this.options.name.split(/\//).filter(Boolean)
 
     this.componentName = this._getComponentName(split)
     this.type = this.options.shallow ? null : this._getComponentType(split)
+    this.moduleType = this.options.cjs ? 'cjs' : 'es6'
   }
 
   writing () {
@@ -79,9 +74,13 @@ module.exports = class extends Generator {
 
   _addTestFile () {
     if (!this.options.shallow && this.options.test) {
-      this.fs.write(
+      const outPath = `${this._getDestinationDirectory()}/test.js`
+      const tplName = `test.${this.moduleType}.js`
+
+      this.fs.copyTpl(
+        this.templatePath(tplName),
         this.destinationPath(this._getDestinationDirectory() + '/test.js'),
-        ''
+        { name: this.componentName }
       )
     }
   }
@@ -89,10 +88,8 @@ module.exports = class extends Generator {
   _copyComponent () {
     const dest = this._getDestinationPath()
 
-    const moduleType = this.options.cjs ? 'cjs' : 'es6'
-
     this.fs.copyTpl(
-      this.templatePath(`component.${moduleType}.js`),
+      this.templatePath(`component.${this.moduleType}.js`),
       this.destinationPath(dest),
       { name: this.componentName }
     )

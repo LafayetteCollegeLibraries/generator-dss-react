@@ -6,25 +6,25 @@ module.exports = class extends Generator {
     super(args, opts)
 
     this.option('coverage', {
-      type: utils.bool,
+      type: utils.bool.true,
       desc: 'Adds coverage reporting via Istanbul / Coveralls',
       default: true,
     })
 
     this.option('editorconfig', {
-      type: utils.bool,
+      type: utils.bool.true,
       desc: 'Adds .editorconfig file',
       default: true,
     })
 
     this.option('lint', {
-      type: utils.bool,
+      type: utils.bool.true,
       desc: 'Adds linting via eslint',
       default: true,
     })
 
     this.option ('tests', {
-      type: utils.bool,
+      type: utils.bool.true,
       desc: 'Installs testing architecture (Karma, Mocha, Chai)',
       default: true,
     })

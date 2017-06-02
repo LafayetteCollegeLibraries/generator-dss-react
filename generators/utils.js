@@ -1,9 +1,24 @@
-module.exports.bool = function bool (val) {
-  if (val === undefined) {
-    return val
-  }
+function bool (def) {
+  return function (val) {
+    if (val === undefined) {
+      return def
+    }
 
-  return val && (val === 'false' || val === 'no' || val === '0')
-    ? false
-    : true
+    if (def === true) {
+      return val &&
+        (val === 'false' || val === 'no' || val === 'n' || val === '0')
+          ? false
+          : true
+    }
+
+    return val &&
+      (val === 'true' || val === 'yes' || val === 'y' || val === '1')
+        ? true
+        : false
+  }
+}
+
+module.exports.bool = {
+  true: bool(true),
+  false: bool(false),
 }
