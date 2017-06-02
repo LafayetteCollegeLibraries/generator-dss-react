@@ -24,6 +24,7 @@ module.exports = class extends Generator {
     return [
       'react',
       'react-dom',
+      'prop-types',
     ]
   }
 
