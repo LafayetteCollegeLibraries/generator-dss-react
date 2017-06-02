@@ -41,6 +41,17 @@ module.exports = class extends Generator {
       default: false
     })
 
+    this.option('test', {
+      alias: 't',
+      desc: 'Adds empty `test.js` file to directory when in full mode',
+      default: true,
+      type: val => (
+        val && (val === 'false' || val === 'no' || val === '0')
+          ? false
+          : true
+      ),
+    })
+
     this.option('type', {
       desc: 'Type of component (used to determine directory within `/src` to insert)',
     })
@@ -59,12 +70,20 @@ module.exports = class extends Generator {
 
   writing () {
     this._copyComponent()
+    this._addTestFile()
+  }
+
+  _addTestFile () {
+    if (!this.options.shallow && this.options.test) {
+      this.fs.write(
+        this.destinationPath(this._getDestinationDirectory() + '/test.js'),
+        ''
+      )
+    }
   }
 
   _copyComponent () {
-    const dest = this.options.shallow
-      ? `src/${this.componentName}.js`
-      : `src/${this.type}s/${this.componentName}/index.js`
+    const dest = this._getDestinationPath()
 
     const moduleType = this.options.cjs ? 'cjs' : 'es6'
 
@@ -112,5 +131,21 @@ module.exports = class extends Generator {
     }
 
     return type
+  }
+
+  _getDestinationDirectory () {
+    return this.options.shallow
+      ? `src`
+      : `src/${this.type}s/${this.componentName}`
+  }
+
+  _getDestinationPath () {
+    const dir = this._getDestinationDirectory()
+
+    if (this.options.shallow) {
+      return `${dir}/${this.componentName}.js`
+    }
+
+    return `${dir}/index.js`
   }
 }
