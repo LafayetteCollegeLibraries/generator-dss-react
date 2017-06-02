@@ -28,6 +28,20 @@ yo dss-react:component
 Creates a new React project and installs `babel`, `webpack`, and `react`
 dependencies.
 
+```
+❯ yo dss-react:init --help
+Usage:
+  yo dss-react:init [options]
+
+Options:
+  -h,   --help          # Print the generator's options and usage
+        --skip-cache    # Do not remember prompt answers                      Default: false
+        --skip-install  # Do not automatically install dependencies           Default: false
+        --coverage      # Adds coverage reporting via Istanbul / Coveralls    Default: true
+        --editorconfig  # Adds .editorconfig file                             Default: true
+        --lint          # Adds linting via eslint                             Default: true
+        --tests         # Installs testing architecture (Karma, Mocha, Chai)  Default: true
+```
 
 ### `yo dss-react:component`
 
@@ -48,6 +62,7 @@ Options:
         --es6           # Use es6 modules (ex. `export default` and `import module from 'module')            Default: true
         --screen        # Shortcut for `--type=screen                                                        Default: false
   -S,   --shallow       # Use shallow file modules (creates files in `/src` directory)                       Default: false
+  -t,   --test          # Adds empty `test.js` file to directory when in full mode                           Default: true
         --type          # Type of component (used to determine directory within `/src` to insert)
 
 Arguments:
