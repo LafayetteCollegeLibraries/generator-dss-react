@@ -9,5 +9,20 @@
   ],
   "ignore": [
     "**/node_modules/**/*"
-  ]
+  ]<% if (coverage) {%>,
+  "env": {
+    "test": {
+      "plugins": [
+        [
+          "istanbul", {
+            "exclude": [
+              "**/test.js",
+              "**/*.test.js"
+            ]
+          }
+        ]
+      ]
+    }
+  }
+  <% } %>
 }
