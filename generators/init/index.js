@@ -7,7 +7,7 @@ module.exports = class extends Generator {
 
     this.option('commit', {
       type: String,
-      desc: 'Message for intitial commit',
+      desc: 'Message for intitial commit (does not commit if missing)',
     })
 
     this.option('skip-coverage', {
