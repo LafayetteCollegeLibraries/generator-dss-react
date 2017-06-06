@@ -5,6 +5,11 @@ module.exports = class extends Generator {
   constructor (args, opts) {
     super(args, opts)
 
+    this.option('commit', {
+      type: String,
+      desc: 'Message for intitial commit',
+    })
+
     this.option('skip-coverage', {
       type: Boolean,
       desc: 'Skip coverage reporting via Istanbul / Coveralls',
@@ -14,6 +19,12 @@ module.exports = class extends Generator {
     this.option('skip-editorconfig', {
       type: Boolean,
       desc: 'Skip adding .editorconfig file',
+      default: false,
+    })
+
+    this.option('skip-git', {
+      type: Boolean,
+      desc: 'Skip setting up git',
       default: false,
     })
 
@@ -30,11 +41,21 @@ module.exports = class extends Generator {
     })
   }
 
+  initializing () {
+    if (!this.options['skip-git']) {
+      this._initGit()
+    }
+  }
+
   prompting () {
     this._installPackageJson()
   }
 
   writing () {
+    if (!this.options['skip-git']) {
+      this._copyGitIgnore()
+    }
+
     this._copyBabelRc()
     this._copyWebpackConfig()
 
@@ -60,6 +81,26 @@ module.exports = class extends Generator {
 
     this.npmInstall(deps, { 'save': true })
     this.npmInstall(devDeps, { 'save-dev': true })
+  }
+
+  end () {
+    if (!this.options['skip-git']) {
+      if (this.options.commit !== undefined) {
+        this.spawnCommandSync('git', [
+          'add', '--all',
+        ])
+
+        this.spawnCommandSync('git', [
+          'commit', '-m', this.options.commit, '--quiet',
+        ])
+      }
+
+      else {
+        this.log('\n=^_^= You\'re all set! Now might be a good time to make your first commit:')
+        this.log('  git add .')
+        this.log('  git commit -m "initial commit"')
+      }
+    }
   }
 
   _getDependencies () {
@@ -181,6 +222,14 @@ module.exports = class extends Generator {
     )
   }
 
+  _copyGitIgnore () {
+    this.fs.copyTpl(
+      this.templatePath('.gitignore'),
+      this.destinationPath('./.gitignore'),
+      { coverage: !this.options['skip-coverage'] }
+    )
+  }
+
   _copyPublicIndex () {
     this.fs.copy(
       this.templatePath('app-index.html'),
@@ -213,5 +262,9 @@ module.exports = class extends Generator {
       this.templatePath('webpack.config.js'),
       this.destinationPath('./webpack.config.js')
     )
+  }
+
+  _initGit () {
+    this.spawnCommandSync('git', ['init', '--quiet'])
   }
 }
