@@ -26,7 +26,8 @@ yo dss-react:component
 ### `yo dss-react:init`
 
 Creates a new React project and installs `babel`, `webpack`, and `react`
-dependencies.
+dependencies as well as sets up a new git repository (and optionally
+allows you to create an initial commit).
 
 ```
 ❯ yo dss-react:init --help
@@ -34,13 +35,15 @@ Usage:
   yo dss-react:init [options]
 
 Options:
-  -h,   --help          # Print the generator's options and usage
-        --skip-cache    # Do not remember prompt answers                      Default: false
-        --skip-install  # Do not automatically install dependencies           Default: false
-        --coverage      # Adds coverage reporting via Istanbul / Coveralls    Default: true
-        --editorconfig  # Adds .editorconfig file                             Default: true
-        --lint          # Adds linting via eslint                             Default: true
-        --tests         # Installs testing architecture (Karma, Mocha, Chai)  Default: true
+  -h,   --help               # Print the generator's options and usage
+        --skip-cache         # Do not remember prompt answers                             Default: false
+        --skip-install       # Do not automatically install dependencies                  Default: false
+        --commit             # Message for intitial commit (does not commit if missing)
+        --skip-coverage      # Skip coverage reporting via Istanbul / Coveralls           Default: false
+        --skip-editorconfig  # Skip adding .editorconfig file                             Default: false
+        --skip-git           # Skip setting up git                                        Default: false
+        --skip-lint          # Skip linting via eslint                                    Default: false
+        --skip-tests         # Skip installing testing architecture (Karma, Mocha, Chai)  Default: false
 ```
 
 ### `yo dss-react:component`

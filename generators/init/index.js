@@ -5,29 +5,46 @@ module.exports = class extends Generator {
   constructor (args, opts) {
     super(args, opts)
 
-    this.option('coverage', {
-      type: utils.bool.true,
-      desc: 'Adds coverage reporting via Istanbul / Coveralls',
-      default: true,
+    this.option('commit', {
+      type: String,
+      desc: 'Message for intitial commit (does not commit if missing)',
     })
 
-    this.option('editorconfig', {
-      type: utils.bool.true,
-      desc: 'Adds .editorconfig file',
-      default: true,
+    this.option('skip-coverage', {
+      type: Boolean,
+      desc: 'Skip coverage reporting via Istanbul / Coveralls',
+      default: false,
     })
 
-    this.option('lint', {
-      type: utils.bool.true,
-      desc: 'Adds linting via eslint',
-      default: true,
+    this.option('skip-editorconfig', {
+      type: Boolean,
+      desc: 'Skip adding .editorconfig file',
+      default: false,
     })
 
-    this.option ('tests', {
-      type: utils.bool.true,
-      desc: 'Installs testing architecture (Karma, Mocha, Chai)',
-      default: true,
+    this.option('skip-git', {
+      type: Boolean,
+      desc: 'Skip setting up git',
+      default: false,
     })
+
+    this.option('skip-lint', {
+      type: Boolean,
+      desc: 'Skip linting via eslint',
+      default: false,
+    })
+
+    this.option('skip-tests', {
+      type: Boolean,
+      desc: 'Skip installing testing architecture (Karma, Mocha, Chai)',
+      default: false,
+    })
+  }
+
+  initializing () {
+    if (!this.options['skip-git']) {
+      this._initGit()
+    }
   }
 
   prompting () {
@@ -35,6 +52,10 @@ module.exports = class extends Generator {
   }
 
   writing () {
+    if (!this.options['skip-git']) {
+      this._copyGitIgnore()
+    }
+
     this._copyBabelRc()
     this._copyWebpackConfig()
 
@@ -62,6 +83,26 @@ module.exports = class extends Generator {
     this.npmInstall(devDeps, { 'save-dev': true })
   }
 
+  end () {
+    if (!this.options['skip-git']) {
+      if (this.options.commit !== undefined) {
+        this.spawnCommandSync('git', [
+          'add', '--all',
+        ])
+
+        this.spawnCommandSync('git', [
+          'commit', '-m', this.options.commit, '--quiet',
+        ])
+      }
+
+      else {
+        this.log('\n=^_^= You\'re all set! Now might be a good time to make your first commit:')
+        this.log('  git add .')
+        this.log('  git commit -m "initial commit"')
+      }
+    }
+  }
+
   _getDependencies () {
     return [
       'react',
@@ -85,12 +126,12 @@ module.exports = class extends Generator {
       'webpack-dev-server',
     ]
 
-    if (this.options.lint) {
+    if (!this.options['skip-lint']) {
       core.push('eslint')
       core.push('eslint-plugin-react')
     }
 
-    if (!this.options.tests) {
+    if (this.options['skip-tests']) {
       return core
     }
 
@@ -110,7 +151,7 @@ module.exports = class extends Generator {
       'react-test-renderer',
     ]
 
-    if (this.options.coverage) {
+    if (!this.options['skip-coverage']) {
       testDeps.push('babel-plugin-istanbul')
       testDeps.push('karma-coverage')
       testDeps.push('karma-coveralls')
@@ -126,12 +167,12 @@ module.exports = class extends Generator {
 
     const tests = []
 
-    if (this.options.lint) {
+    if (!this.options['skip-lint']) {
       scripts['test:lint'] = 'eslint src'
       tests.push('test:lint')
     }
 
-    if (this.options.tests) {
+    if (!this.options['skip-tests']) {
       const t = 'NODE_ENV=test karma start'
       scripts['test:unit'] = t + ' --single-run'
       scripts['test:unit:watch'] = t + ' --auto-watch'
@@ -163,7 +204,7 @@ module.exports = class extends Generator {
     this.fs.copyTpl(
       this.templatePath('.babelrc'),
       this.destinationPath('./.babelrc'),
-      { coverage: this.options.tests && this.options.coverage}
+      { coverage: !this.options['skip-tests'] && !this.options['skip-coverage']}
     )
   }
 
@@ -178,6 +219,14 @@ module.exports = class extends Generator {
     this.fs.copy(
       this.templatePath('.editorconfig'),
       this.destinationPath('./.editorconfig')
+    )
+  }
+
+  _copyGitIgnore () {
+    this.fs.copyTpl(
+      this.templatePath('.gitignore'),
+      this.destinationPath('./.gitignore'),
+      { coverage: !this.options['skip-coverage'] }
     )
   }
 
@@ -204,7 +253,7 @@ module.exports = class extends Generator {
     this.fs.copyTpl(
       this.templatePath('karma.conf.js'),
       this.destinationPath('./karma.conf.js'),
-      { coverage: this.options.coverage }
+      { coverage: !this.options['skip-coverage'] }
     )
   }
 
@@ -213,5 +262,9 @@ module.exports = class extends Generator {
       this.templatePath('webpack.config.js'),
       this.destinationPath('./webpack.config.js')
     )
+  }
+
+  _initGit () {
+    this.spawnCommandSync('git', ['init', '--quiet'])
   }
 }
